@@ -1,0 +1,10 @@
+div.container
+    div.row
+        div.col-md-12
+            h1 All tags:
+            div.row
+                div.col-md-6
+                    ul.list-inline
+                        li(ng-repeat="tag in tags")
+                            h2
+                                span.label.label-default {{ tag }}

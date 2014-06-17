@@ -1,0 +1,15 @@
+div.navbar-right(ng-controller="loginCtrl")
+    form.navbar-form(ng-hide="identity.isAuthenticated()")
+        div.form-group
+            input.form-control(placeholder="username", ng-model="username")
+
+        div.form-group
+            input.form-control(placeholder="password", ng-model="password")
+
+        button.btn.btn-primary(ng-click="signIn(username, password)") Sign In
+
+    ul.nav.navbar-nav(ng-show="identity.isAuthenticated()")
+        li
+            p.navbar-text Signed in as {{identity.currentUser.username}}
+        li
+            a(href="", ng-click="signOut()") Sign Out
