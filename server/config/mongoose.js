@@ -50,7 +50,10 @@ module.exports = function(config) {
         if (collection.length === 0) {
             var salt = createSalt();
             var hash = createPasswordHash(salt, 'test');
-            User.create({username:'test', salt: salt, password: hash, role: ['admin'], tags: ['bing', 'facebook']});
+            User.create({username:'test', salt: salt, password: hash, roles: ['admin'], tags: ['bing', 'facebook']});
+            var salt = createSalt();
+            var hash = createPasswordHash(salt, 'lol');
+            User.create({username:'lol', salt: salt, password: hash, roles: [], tags: []});
         }
     });
 

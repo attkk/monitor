@@ -6,10 +6,18 @@ div.navbar-right(ng-controller="loginCtrl")
         div.form-group
             input.form-control(placeholder="password", ng-model="password")
 
-        button.btn.btn-primary(ng-click="signIn(username, password)") Sign In
+        div.btn-group
+            button.btn.btn-primary(ng-click="signIn(username, password)") Sign In
+            button.btn.btn-primary(ng-click="registerUser(username, password)") Register
 
     ul.nav.navbar-nav(ng-show="identity.isAuthenticated()")
         li
             p.navbar-text Signed in as {{identity.currentUser.username}}
+
+
+        li(ng-show="identity.currentUser.isAdmin()")
+            a(href="/admin/users") Admin User
+
+
         li
             a(href="", ng-click="signOut()") Sign Out

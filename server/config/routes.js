@@ -1,11 +1,17 @@
 var passport = require('passport'),
+    auth = require('./auth'),
     users = require('../controllers/users'),
-    tags = require('../controllers/tags');
-
+    tags = require('../controllers/tags'),
+    User = require('mongoose').model('User');
 
 module.exports = function(app) {
-
     app.get('/api/tags', users.getAllTags);
+
+    app.get('/api/users', auth.requiresLogin, function(req, res) {
+        User.find().exec(function(err, collection) {
+            res.send(collection);
+        })
+    });
 
     app.get('/partials/*', function(req, res) {
         var path = req.params[0];

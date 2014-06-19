@@ -1,11 +1,13 @@
-angular.module('app').controller('loginCtrl', function($scope, $http, $location, identity) {
+angular.module('app').controller('loginCtrl', function($scope, $http, $location, identity, userResource) {
     // Add isAuthenticated() method to scope
     $scope.identity = identity;
 
     $scope.signIn = function(username, password) {
         $http.post('/login', {username: username, password: password}).then(function(response) {
             if (response.data.success) {
-                identity.currentUser = response.data.user;
+                var user = new userResource();
+                _.extend(user, response.data.user);
+                identity.currentUser = user;
                 console.log('logged in!');
             } else {
                 console.log('failed to log in');
@@ -19,5 +21,9 @@ angular.module('app').controller('loginCtrl', function($scope, $http, $location,
             $scope.username = $scope.password = '';
             $location.path('/');
         });
+    };
+
+    $scope.registerUser = function() {
+
     }
 });
