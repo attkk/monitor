@@ -1,0 +1,18 @@
+div.container
+    div.row
+        div.col-md-4
+            form(role="form", name="tagsForm")
+                div.form-group
+                    label(for="username") Tag:
+                    input.form-control(name="tag", type="text", id="tag", placeholder="Enter new tag", ng-model="formData.tag", required)
+
+                button.btn.btn-primary(ng-click="addTag()", ng-disabled="tagsForm.$invalid") Submit
+                a.btn.btn-primary.btn-margin(href="/") Cancel
+
+    div.row
+        div.col-md-12
+            h1.page-header {{ "List of " + user.username + "'s tags:"}}
+            ul.list-inline
+                li(ng-repeat="tag in tags")
+                    h2
+                        span.label.label-default {{ tag }}

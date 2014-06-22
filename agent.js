@@ -29,69 +29,111 @@ var oauth = new oauth.OAuth(
 // Server api variable
 var url = 'http://' + server_host + ':' + server_port + '/api/tags/';
 
-// Agent methods
+var server_url = 'http://localhost:3030';
 
-// Get tags from server via REST API
-var getTags = function(url) {
+var getAllUniqueTags = function(url) {
     var promise = new rsvp.Promise(function(resolve, reject) {
         request.get(url, handler);
         function handler(error, response) {
             if (error) reject(this);
-            resolve(JSON.parse(response.body));
+            var tagList = JSON.parse(response.body);
+            //var tagList = ['test5tag'];
+            resolve(tagList);
         }
     });
     return promise;
 };
 
-// Get tweets by specific tag
 var getTweetsByTag = function(tag) {
 	var promise = new rsvp.Promise(function(resolve, reject) {
-		var twitter_url = 'https://api.twitter.com/1.1/search/tweets.json?q=%23' + tag + '&count=10';
-        // TODO: add custom tweets count
-		oauth.get(twitter_url, oauth_token, oauth_secret, handler);
-		function handler(error, data, response) {
-			if (error) reject(this);
-			resolve([JSON.parse(data), tag]);
-		}
+        var tagObj = JSON.parse(tag),
+            count = 20,
+            baseUrl = 'https://api.twitter.com/',
+            twitterUrl = baseUrl + '1.1/search/tweets.json?q=%23' + tagObj.tag + '&count=' + count;
+
+        if (!!tagObj.lastId) {
+            twitterUrl = twitterUrl + '&since_id=' + tagObj.lastId;
+        }
+        console.log(twitterUrl);
+		oauth.get(twitterUrl, oauth_token, oauth_secret, function(error, data, response) {
+            if (error) reject(this);
+
+
+
+            var data = {tagObj: tagObj, tweetsQueryObj: JSON.parse(data)};
+            resolve(data);
+        });
 	});
 	return promise;
 };
 
-// Save tweets to corresponding tag collection via sending REST put request
+var getTagObjByTagName = function(tag) {
+    var promise = new rsvp.Promise(function(resolve, reject) {
+
+        var url = server_url + '/api/tweets/' + tag;
+
+        request.get(url, function(error, response) {
+            if (error) reject(this);
+            var tag = response.body;
+            resolve(tag);
+        });
+    });
+    return promise;
+};
+
 var saveTagTweets = function(data) {
 	var promise = new rsvp.Promise(function(resolve, reject) {
+        var resultObj = data,
+            tag = resultObj.tagObj.tag,
+            tweetList = resultObj.tweetsQueryObj['statuses'],
+            lastTweetId = resultObj.tweetsQueryObj['search_metadata']['max_id'];
 
+        /*
+        console.log(tag);
+        console.log(tweetList);
+        console.log(lastTweetId);
+
+
+
+        // Remove element from previous search
+        if (!!tag.lastId) {
+            if (tweetList[tweetList.length - 1].id === tag.lastId){
+                tweetList.pop();
+            }
+        }
+
+        console.log(tweetList);
+*/
 		var options = {
-			url: 'http://localhost:3030/api/tweets/' + data[1],
+			url: 'http://localhost:3030/api/tweets/' + tag,
 			method: 'PUT',
-			body: JSON.stringify(data[0]),
+			body: JSON.stringify({tweets: tweetList, lastId: lastTweetId}),
 			headers: {
 				'Content-Type': 'application/json'
 			}
 		};
 
-		console.log(data[0]['statuses'][0]['text']); //TODO: remove this
 		request(options, handler);
 		function handler(error, response) {
 			if (error) reject(error);
-            console.log(response.statusCode + 'OK');
-			resolve(response.statusCode);
+            console.log(response.statusCode);
+			resolve();
 		}
 	});
 	return promise;
 };
 
-// Main chain
-setInterval(function() {
-    console.log('Started process chain...');
-    getTags(url)
-    .then(function(tags) {
-        _.each(tags, function(tag) {
-            getTweetsByTag(tag)
-            .then(saveTagTweets);
-        });
-    }, function(error) {
-        console.log(error);
+//setInterval(function() {
+console.log('Started process chain...');
+getAllUniqueTags(url)
+.then(function(tags) {
+    _.each(tags, function(tag) {
+        getTagObjByTagName(tag)
+        .then(getTweetsByTag)
+        .then(saveTagTweets);
     });
+}, function(error) {
+    console.log(error);
+});
 
-}, fetch_interval);
+//}, fetch_interval);

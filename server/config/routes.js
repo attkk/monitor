@@ -2,16 +2,22 @@ var passport = require('passport'),
     auth = require('./auth'),
     users = require('../controllers/users'),
     tags = require('../controllers/tags'),
+    tweets = require('../controllers/tweets'),
+
     User = require('mongoose').model('User');
 
 module.exports = function(app) {
     app.get('/api/tags', users.getAllTags);
+    app.get('/api/tags/:id', users.getTagsByUser);
+    app.post('/api/tags/:id', users.addUserTag);
 
     app.get('/api/users', auth.requiresLogin, function(req, res) {
         User.find().exec(function(err, collection) {
             res.send(collection);
         })
     });
+
+    app.post('/api/users', users.createUser);
 
     app.get('/partials/*', function(req, res) {
         var path = req.params[0];
@@ -36,7 +42,12 @@ module.exports = function(app) {
 
     // REST API routes for agent communication
     app.get('/api/tags/', users.getAllTags);
+    app.get('/api/tweets/:tag', tags.getTagByTagName);
     app.put('/api/tweets/:tag', tags.updateTagTweets);
+
+    // List of all tag related tweets
+    app.get('/api/feed/:id', tweets.getUserTweets);
+
 
     app.all('/api/*', function(req, res) {
         res.send(404);

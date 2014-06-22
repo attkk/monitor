@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-    crypto = require('crypto');
+    passwords = require('../common/passwords');
 
 module.exports = function(config) {
     mongoose.connect(config.db);
@@ -18,29 +18,21 @@ module.exports = function(config) {
         salt: String,
         password: String,
         roles: [String],
-        tags: [Schema.Types.Mixed]
+        tags: [Schema.Types.Mixed] //TODO: change to array?
     });
 
     userSchema.methods = {
         validPassword: function(password) {
-        return createPasswordHash(this.salt, password) === this.password;
+        return passwords.createPasswordHash(this.salt, password) === this.password;
          }
     };
-
-    function createSalt() {
-        return crypto.randomBytes(128).toString('base64');
-    }
-
-    function createPasswordHash(salt, password) {
-        var hmac = crypto.createHmac('sha1', salt);
-        return hmac.update(password).digest('hex');
-    }
 
     // Tags
 
     var tagSchema = new Schema({
         tag: String,
-        tweets: Object
+        tweets: [Schema.Types.Mixed],
+        lastId: String
     });
 
     // Create initial data
@@ -48,20 +40,27 @@ module.exports = function(config) {
     var User = mongoose.model('User', userSchema);
     User.find({}).exec(function(err, collection) {
         if (collection.length === 0) {
-            var salt = createSalt();
-            var hash = createPasswordHash(salt, 'test');
-            User.create({username:'test', salt: salt, password: hash, roles: ['admin'], tags: ['bing', 'facebook']});
-            var salt = createSalt();
-            var hash = createPasswordHash(salt, 'lol');
-            User.create({username:'lol', salt: salt, password: hash, roles: [], tags: []});
+            var salt = passwords.createSalt();
+            var hash = passwords.createPasswordHash(salt, 'test');
+            //User.create({username:'test', salt: salt, password: hash, roles: ['admin', 'user'], tags: ['bing', 'facebook']});
+            User.create({username:'test', salt: salt, password: hash, roles: ['admin', 'user'], tags: []});
+            var salt = passwords.createSalt();
+            var hash = passwords.createPasswordHash(salt, 'lol');
+            User.create({username:'lol', salt: salt, password: hash, roles: [], tags: ['apple']});
         }
     });
 
     var Tag = mongoose.model('Tag', tagSchema);
     Tag.find().exec(function(err, collection) {
         if (collection.length === 0) {
-            Tag.create({tag: 'bing', tweets: undefined});
-            Tag.create({tag: 'facebook', tweets: undefined});
+//            Tag.create({tag: 'bing', tweets: undefined});
+//            Tag.create({tag: 'facebook', tweets: undefined});
+//            Tag.create({tag: 'apple', tweets: undefined});
+//            Tag.create({tag: 'test5tag', tweets: undefined});
         }
     });
+
+    function toObjectId(id) {
+        return mongoose.Types.ObjectId.fromString(id);
+    }
 };

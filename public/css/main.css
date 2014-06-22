@@ -1,15 +1,19 @@
 body {
-  padding-top: 69px;
+    padding-top: 69px;
 }
 
 .navbar-header a.navbar-header h6 {
-  color: #ccc;
+    color: #ccc;
 }
 
 .navbar-form .form-group {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 .navbar-form div.btn-group {
-  margin-left: 10px;
+    margin-left: 10px;
+}
+
+.btn-margin {
+    margin-left: 5px;
 }

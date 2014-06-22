@@ -1,2 +1,13 @@
 div.container
-    fo
+    div.row
+        div.col-md-4
+            form(role="form", name="registrationForm")
+                div.form-group
+                    label(for="username") Username:
+                    input.form-control(name="username", type="text", id="username", placeholder="Enter username", ng-model="username", required)
+                div.form-group
+                    label(for="password") Password:
+                    input.form-control(name="password", type="password", id="username", placeholder="Enter password", ng-model="password", required)
+
+                button.btn.btn-primary(ng-click="registerUser()", ng-disabled="registrationForm.$invalid") Submit
+                a.btn.btn-primary(href="/") Cancel

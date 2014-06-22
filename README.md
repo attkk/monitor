@@ -3,20 +3,23 @@ Social Monitor (Training task)
 
 Installation and server start:
 
-* ```npm install```
+* ```sudo apt-get install mongodb```
+* ```sudo npm install```
+* ```sudo npm install bower```
 * ```bower install```
-* ```node server.js```
 * ```node agent.js```
-
+* ```node server.js```
 
 # Current status:
 
-* Agent gets tags from all users and, reveives number of corresponding tweets and puts all data back to server
-* User authentication implemented
-* All MongoDB schemas are implemented for future UI
+* Agent (uses search api with since_id to store all tweets)
+* User authentication and authorization
+* User registration
+* Adding tags and tweet feed for every user
 
 # TODO:
 
-* Add user registration form
-* Add simple form for new tags
-* Finish roles and authorization functionality
+* Refactoring
+* Finish security and roles functionality
+* Add validation and notification
+* Add charts

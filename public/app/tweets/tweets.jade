@@ -1,0 +1,15 @@
+.container
+    div.row
+        div.col-md-12
+            table
+                tr(ng-repeat="msg in feedList | limitTo:20")
+                    td
+                        div.row
+                            div.col-md-1
+                                span.label.label-primary {{ msg.tag }}
+
+                            div.col-md-11
+                                div.well.well-sm {{ msg.text }}
+
+
+
